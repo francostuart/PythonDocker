@@ -12,8 +12,11 @@ pipeline {
 
     stage('Checkout') {
       steps {
-        checkout scm
-      }
+        checkout([$class: 'GitSCM',
+            branches: [[name: 'refs/heads/cloud']],
+            userRemoteConfigs: [[url: 'https://github.com/francostuart/PythonDocker.git']]
+    ])
+  }
     }
 
     stage('Setup Python Env') {
