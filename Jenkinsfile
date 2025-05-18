@@ -146,18 +146,28 @@ pipeline {
     stage('Deploy to Render') {
       when { branch 'multibranch' }
       steps {
-        withCredentials([string(
-          credentialsId: 'render-api-key',
-          variable: 'RENDER_API_KEY'
-        )]) {
-          sh '''
-            echo "Triggering deploy on Render..."
-            curl -X POST https://api.render.com/deploy/srv-d0k4vube5dus73bfckn0?key=YRPtr7tzvnE \
-              -H "Accept: application/json" \
-              -H "Authorization: Bearer $RENDER_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{"clearCache": false}'
-          '''
+        script{
+
+            // 1. Leemos la versión
+            def tag = readFile('version.txt').trim()
+            if (!tag) {
+                error "❌ version.txt está vacío o no existe"
+            }
+            echo "✅ Versión leída: ${tag}"
+
+            withCredentials([string(
+              credentialsId: 'render-api-key',
+              variable: 'RENDER_API_KEY'
+            )]) {
+              sh """
+                echo "Triggering deploy on Render..."
+                curl -X POST https://api.render.com/deploy/srv-d0k4vube5dus73bfckn0?key=YRPtr7tzvnE \
+                  -H "Accept: application/json" \
+                  -H "Authorization: Bearer $RENDER_API_KEY" \
+                  -H "Content-Type: application/json" \
+                  -d '{"clearCache": false, "dockerTag": "${tag}"}'
+              """
+            }
         }
       }
     }
