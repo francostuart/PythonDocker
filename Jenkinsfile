@@ -2,9 +2,10 @@ pipeline {
   agent any
 
   environment {
-    VENV_DIR = 'venv'
-    IMAGE_NAME = 'my-python-app'
-    IMAGE_TAG = 'latest'
+    VENV_DIR    = 'venv'
+    IMAGE_NAME  = 'my-python-app'
+    IMAGE_TAG   = 'latest'
+    DOCKER_REPO = 'rbueno23/my-python-app'  // <–– ajusta aquí
   }
 
   stages {
@@ -61,6 +62,47 @@ pipeline {
         '''
       }
     }
+
+    stages {
+    // … Checkout, Setup, Linting, Testing, Build Docker Image …
+    stage('Push Docker Image') {
+      when { branch 'main' }
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh '''
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_REPO:$IMAGE_TAG
+            docker push $DOCKER_REPO:$IMAGE_TAG
+          '''
+        }
+      }
+    }
+
+
+    stage('Deploy to Render') {
+      when { branch 'main' }
+      steps {
+        withCredentials([string(
+          credentialsId: 'render-api-key',
+          variable: 'RENDER_API_KEY'
+        )]) {
+          sh '''
+            echo "Triggering deploy on Render..."
+            curl -X POST https://api.render.com/deploy/srv-d0k4vube5dus73bfckn0/deploys \
+              -H "Accept: application/json" \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"clearCache": false}'
+          '''
+        }
+      }
+    }
+
+
   }
 
   post {
