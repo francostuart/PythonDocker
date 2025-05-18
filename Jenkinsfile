@@ -4,7 +4,8 @@ pipeline {
   environment {
     VENV_DIR    = 'venv'
     IMAGE_NAME  = 'my-python-app'
-    IMAGE_TAG   = "${BUILD_NUMBER}"
+    //IMAGE_TAG   = "${BUILD_NUMBER}"
+    IMAGE_TAG = ''
     DOCKER_REPO = 'rbueno23/my-python-app'  // <–– ajusta aquí
   }
 
@@ -60,6 +61,25 @@ pipeline {
           pytest --maxfail=1 --disable-warnings -q
         '''
       }*/
+    }
+
+    stage('Get Version') {
+      steps {
+        script {
+          // === SI USAS __version__ en Python ===
+          /*def version = sh(
+            script: 'python3 - <<EOF\nimport app; print(app.__version__)\nEOF',
+            returnStdout: true
+          ).trim()*/
+
+          // === O, SI USAS version.txt ===
+          def version = readFile('version.txt').trim()
+
+          // Asignamos a la variable de entorno
+          env.IMAGE_TAG = version
+          echo "Usando versión según código: ${env.IMAGE_TAG}"
+        }
+      }
     }
 
     stage('Build Docker Image') {
