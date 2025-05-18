@@ -38,21 +38,26 @@ pipeline {
       }
     }
 
-    /*stage('Testing') {
-      steps {
+    stage('Testing') {
+       steps{
+        sh '''
+          echo "Pendiente ejecucion de pytest..."
+        '''
+        }
+      /*steps {
         sh '''
           . $VENV_DIR/bin/activate
           echo "Ejecutando pytest..."
           pytest --maxfail=1 --disable-warnings -q
         '''
-      }
-    }*/
+      }*/
+    }
 
     stage('Build Docker Image') {
       steps {
         sh '''
           echo "Construyendo imagen Docker..."
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
         '''
       }
     }
