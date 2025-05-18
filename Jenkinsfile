@@ -63,7 +63,7 @@ pipeline {
       }*/
     }
 
-    stage('Get Version') {
+    /*stage('Get Version') {
       steps {
         script {
           // 1) Listamos y cat para ver caracteres invisibles
@@ -92,14 +92,24 @@ pipeline {
           echo "✅ Usando versión según código: ${env.IMAGE_TAG}"
         }
       }
-    }
+    }*/
 
     stage('Build Docker Image') {
       steps {
-        sh '''
-          echo "Construyendo imagen Docker..."
-          docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
-        '''
+        script {
+
+          // 1. Leemos la versión
+          def version = readFile('version.txt').trim()
+          if (!version) {
+            error "❌ version.txt está vacío o no existe"
+          }
+          echo "✅ Versión leída: ${version}"
+
+            sh '''
+              echo "Construyendo imagen Docker..."
+              docker build --no-cache -t ${IMAGE_NAME}:${version} .
+            '''
+        }
       }
     }
 
