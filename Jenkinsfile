@@ -63,6 +63,12 @@ pipeline {
       }*/
     }
 
+    stage('Debug Files') {
+      steps {
+        sh 'echo "Listing workspace:" && ls -l .'
+        }
+    }
+
     stage('Get Version') {
       steps {
         script {
