@@ -63,7 +63,7 @@ pipeline {
       }
     }
 
-    stages {
+
     // … Checkout, Setup, Linting, Testing, Build Docker Image …
     stage('Push Docker Image') {
       when { branch 'main' }
@@ -100,6 +100,8 @@ pipeline {
           '''
         }
       }
+    }
+
 
   }
 
