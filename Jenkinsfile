@@ -15,8 +15,16 @@ pipeline {
         checkout([$class: 'GitSCM',
             branches: [[name: 'refs/heads/cloud']],
             userRemoteConfigs: [[url: 'https://github.com/francostuart/PythonDocker.git']]
-    ])
-  }
+            ])
+        }
+    }
+
+    //debug branch
+    stage('Debug Branch') {
+       steps {
+         sh 'echo "BRANCH_NAME=$BRANCH_NAME"'
+         sh 'git rev-parse --abbrev-ref HEAD'
+       }
     }
 
     stage('Setup Python Env') {
@@ -104,16 +112,6 @@ pipeline {
         }
       }
     }
-
-    //debug branch
-    stage('Debug Branch') {
-       steps {
-         sh 'echo "BRANCH_NAME=$BRANCH_NAME"'
-         sh 'git rev-parse --abbrev-ref HEAD'
-       }
-    }
-
-
 
   }
 
