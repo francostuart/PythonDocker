@@ -63,27 +63,33 @@ pipeline {
       }*/
     }
 
-    stage('Debug Files') {
-      steps {
-        sh 'echo "Listing workspace:" && ls -l .'
-        }
-    }
-
     stage('Get Version') {
       steps {
         script {
-          // === SI USAS __version__ en Python ===
-          /*def version = sh(
-            script: 'python3 - <<EOF\nimport app; print(app.__version__)\nEOF',
-            returnStdout: true
-          ).trim()*/
+          // 1) Listamos y cat para ver caracteres invisibles
+          sh '''
+            echo ">>> Listando workspace:"
+            ls -l .
+            echo ">>> Contenido crudo de version.txt (con cat -v para ver BOM/CRLF):"
+            cat -v version.txt || true
+          '''
 
-          // === O, SI USAS version.txt ===
-          def version = readFile('version.txt').trim()
+          // 2) Leemos con readFile y mostramos longitud
+          def raw = readFile('version.txt')
+          echo "Raw readFile: '${raw}' (longitud=${raw.length()})"
 
-          // Asignamos a la variable de entorno
+          // 3) Hacemos trim() y volvemos a medir
+          def version = raw.trim()
+          echo "Trimmed version: '${version}' (longitud=${version.length()})"
+
+          // 4) Fallamos si sigue vacío
+          if (!version) {
+            error "❌ version.txt está vacío o tiene sólo espacios/CRLF/BOM."
+          }
+
+          // 5) Asignamos a la variable de entorno
           env.IMAGE_TAG = version
-          echo "Usando versión según código: ${env.IMAGE_TAG}"
+          echo "✅ Usando versión según código: ${env.IMAGE_TAG}"
         }
       }
     }
