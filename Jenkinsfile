@@ -1,105 +1,89 @@
 pipeline {
-    agent any
+  agent {
+    docker {
+      image 'python:3.11-slim' // Usa imagen similar a la del Dockerfile
+      args  '-u root:root' // evita problemas de permisos
+    }
+  }
 
-    environment {
-        PYTHON_VERSION = '3' // Puedes ajustar la versión de Python que necesites
-        VIRTUAL_ENV = 'venv'
+  environment {
+    VENV_DIR = 'venv'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Set Up Environment') {
-            steps {
-                script {
-                    // Instalar una versión específica de Python (si es necesario y el agente lo permite)
-                    sh "python${PYTHON_VERSION} -m venv ${VIRTUAL_ENV}"
-                    sh ". ${VIRTUAL_ENV}/bin/activate"
-                    sh "python --version"
-                    sh "pip --version"
-                }
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate"
-                    sh 'pip install -r requirements.txt'
-                }
-            }
-        }
-
-        stage('Linting') {
-            steps {
-                script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate"
-                    // Ejemplo usando Flake8 para linting
-                    sh 'pip install --upgrade pip setuptools wheel'
-                    sh 'pip install flake8'
-                    sh 'flake8 .'
-                }
-            }
-        }
-
-        stage('Testing') {
-            steps {
-                script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate"
-                    // Ejemplo usando pytest para ejecutar las pruebas
-                    sh 'pip install pytest'
-                    sh 'pytest'
-                    // O si tienes un archivo de configuración específico para pytest
-                    // sh 'pytest -c pytest.ini'
-                }
-            }
-        }
-
-        stage('Build Package (Optional)') {
-            steps {
-                script {
-                    sh ". ${VIRTUAL_ENV}/bin/activate"
-                    sh 'pip install --upgrade pip setuptools wheel'
-                    sh 'python setup.py sdist bdist_wheel'
-                    sh 'ls dist/*.whl dist/*.tar.gz'
-                }
-            }
-            // Condición para ejecutar esta etapa solo en la rama 'main' o 'master'
-            when {
-                branch 'main'
-            }
-        }
-
-        /*stage('Publish Package (Optional)') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'PYPI_USERNAME', passwordVariable: 'PYPI_PASSWORD')]) {
-                        sh ". ${VIRTUAL_ENV}/bin/activate"
-                        sh 'pip install twine'
-                        sh "twine upload --repository pypi --username '${PYPI_USERNAME}' --password '${PYPI_PASSWORD}' dist/*"
-                    }
-                }
-            }
-            // Condición para ejecutar esta etapa solo en tags (releases)
-            when {
-                tag '*'
-            }
-        }*/
+    stage('Install Tools') {
+      steps {
+        sh '''
+          apt-get update
+          apt-get install -y git build-essential
+        '''
+      }
     }
 
-    post {
-        always {
-            echo 'Pipeline finished'
-        }
-        success {
-            echo 'Build succeeded'
-        }
-        failure {
-            echo 'Build failed'
-        }
+    stage('Set Up Virtual Env') {
+      steps {
+        sh '''
+          python -m venv $VENV_DIR
+          . $VENV_DIR/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 pytest
+        '''
+      }
     }
+
+    stage('Linting') {
+      steps {
+        sh '''
+          . $VENV_DIR/bin/activate
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        '''
+      }
+    }
+
+    stage('Testing') {
+      steps {
+        sh '''
+          . $VENV_DIR/bin/activate
+          pytest --maxfail=1 --disable-warnings -q
+        '''
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          docker build -t my-python-app:latest .
+        '''
+      }
+    }
+
+    stage('Push & Deploy (Render)') {
+      when {
+        branch 'main'
+      }
+      steps {
+        echo 'Aquí puedes usar render.yaml o curl a la API de Render para desplegar'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo '✅ Todo pasó correctamente'
+    }
+    failure {
+      echo '❌ Falló alguna etapa'
+    }
+    always {
+      echo '🏁 Pipeline finalizado'
+    }
+  }
 }
