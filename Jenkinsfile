@@ -107,7 +107,7 @@ pipeline {
 
             sh """
               echo "Construyendo imagen Docker..."
-              docker build --platform linux/amd64 --no-cache -t ${IMAGE_NAME}:${version} .
+              docker buildx build --platform linux/amd64 --no-cache -t ${IMAGE_NAME}:${version} .
             """
         }
       }
