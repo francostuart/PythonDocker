@@ -100,7 +100,7 @@ pipeline {
         )]) {
           sh '''
             echo "Triggering deploy on Render..."
-            curl -X POST https://api.render.com/deploy/srv-d0k4vube5dus73bfckn0/deploys \
+            curl -X POST https://api.render.com/deploy/srv-d0k4vube5dus73bfckn0?key=YRPtr7tzvnE \
               -H "Accept: application/json" \
               -H "Authorization: Bearer $RENDER_API_KEY" \
               -H "Content-Type: application/json" \
