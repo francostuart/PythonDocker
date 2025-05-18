@@ -105,10 +105,10 @@ pipeline {
           }
           echo "✅ Versión leída: ${version}"
 
-            sh '''
+            sh """
               echo "Construyendo imagen Docker..."
               docker build --no-cache -t ${IMAGE_NAME}:${version} .
-            '''
+            """
         }
       }
     }
