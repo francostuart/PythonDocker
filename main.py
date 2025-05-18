@@ -1,4 +1,3 @@
-# interactuar_web.py
 import time
 import os
 import json
@@ -10,15 +9,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 
 CAPTURAS_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "capturas")
+
 # Si no existe, la creamos
 os.makedirs(CAPTURAS_DIR, exist_ok=True)
 
-# Montamos el directorio como estático
 # Montamos ya con la certeza de que existe
 app.mount("/capturas", StaticFiles(directory=CAPTURAS_DIR), name="capturas")
 
