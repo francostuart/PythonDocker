@@ -30,7 +30,7 @@ def root():
 def interactuar_con_web():
 
     options = Options()
-    opts.binary_location = "/usr/bin/chromium"
+    options.binary_location = "/usr/bin/chromium"
     # options.binary_location = "/usr/bin/chromium"
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
