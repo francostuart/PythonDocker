@@ -4,7 +4,7 @@ pipeline {
   environment {
     VENV_DIR    = 'venv'
     IMAGE_NAME  = 'my-python-app'
-    IMAGE_TAG   = 'latest'
+    IMAGE_TAG   = "${BUILD_NUMBER}"
     DOCKER_REPO = 'rbueno23/my-python-app'  // <–– ajusta aquí
   }
 
@@ -83,8 +83,8 @@ pipeline {
         )]) {
           sh '''
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_REPO:$IMAGE_TAG
-            docker push $DOCKER_REPO:$IMAGE_TAG
+            docker tag ${IMAGE_NAME}:latest ${DOCKER_REPO}:${IMAGE_TAG}
+            docker push ${DOCKER_REPO}:${IMAGE_TAG}
           '''
         }
       }
