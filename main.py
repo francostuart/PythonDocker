@@ -20,9 +20,11 @@ os.makedirs(CAPTURAS_DIR, exist_ok=True)
 # Montamos ya con la certeza de que existe
 app.mount("/capturas", StaticFiles(directory=CAPTURAS_DIR), name="capturas")
 
+
 @app.get("/")
 def root():
     return {"message": "Scraping API con Selenium"}
+
 
 @app.get("/scrap")
 def interactuar_con_web():
@@ -74,13 +76,14 @@ def interactuar_con_web():
 
         fecha_actual = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-        #captura de pantallla
+        # captura de pantallla
         screenshot_path = output_dir / f"captura_arena_{fecha_actual}.png"
         driver.save_screenshot(screenshot_path)
         return {"message": "Scraping finalizado correctamente"}
 
     finally:
         driver.quit()  # Cerramos el navegador
+
 
 @app.get("/list")
 async def listar_capturas_json(carpeta="capturas"):
