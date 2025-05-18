@@ -12,10 +12,7 @@ pipeline {
 
     stage('Checkout') {
       steps {
-        checkout([$class: 'GitSCM',
-            branches: [[name: 'refs/heads/cloud']],
-            userRemoteConfigs: [[url: 'https://github.com/francostuart/PythonDocker.git']]
-            ])
+        checkout scm
         }
     }
 
@@ -77,7 +74,7 @@ pipeline {
 
     // … Checkout, Setup, Linting, Testing, Build Docker Image …
     stage('Push Docker Image') {
-      //when { branch 'cloud' } comentado para modo pipeline, en multibranch si funciona
+      when { branch 'multibranch' } //comentado para modo pipeline, en multibranch si funciona
       steps {
         withCredentials([usernamePassword(
           credentialsId: 'dockerhub-creds',
@@ -95,7 +92,7 @@ pipeline {
 
 
     stage('Deploy to Render') {
-      //when { branch 'cloud' }
+      when { branch 'multibranch' }
       steps {
         withCredentials([string(
           credentialsId: 'render-api-key',
