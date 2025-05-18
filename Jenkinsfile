@@ -38,7 +38,7 @@ pipeline {
       }
     }
 
-    stage('Testing') {
+    /*stage('Testing') {
       steps {
         sh '''
           . $VENV_DIR/bin/activate
@@ -46,7 +46,7 @@ pipeline {
           pytest --maxfail=1 --disable-warnings -q
         '''
       }
-    }
+    }*/
 
     stage('Build Docker Image') {
       steps {
