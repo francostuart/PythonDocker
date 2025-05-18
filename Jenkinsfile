@@ -66,7 +66,7 @@ pipeline {
 
     // … Checkout, Setup, Linting, Testing, Build Docker Image …
     stage('Push Docker Image') {
-      when { branch 'main' }
+      when { branch 'cloud' }
       steps {
         withCredentials([usernamePassword(
           credentialsId: 'dockerhub-creds',
@@ -84,7 +84,7 @@ pipeline {
 
 
     stage('Deploy to Render') {
-      when { branch 'main' }
+      when { branch 'cloud' }
       steps {
         withCredentials([string(
           credentialsId: 'render-api-key',
