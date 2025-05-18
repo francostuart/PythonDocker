@@ -118,16 +118,26 @@ pipeline {
     stage('Push Docker Image') {
       when { branch 'multibranch' } //comentado para modo pipeline, en multibranch si funciona
       steps {
-        withCredentials([usernamePassword(
-          credentialsId: 'dockerhub-creds',
-          usernameVariable: 'DOCKER_USER',
-          passwordVariable: 'DOCKER_PASS'
-        )]) {
-          sh '''
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker tag ${IMAGE_NAME}:latest ${DOCKER_REPO}:${IMAGE_TAG}
-            docker push ${DOCKER_REPO}:${IMAGE_TAG}
-          '''
+        script{
+
+            // 1. Leemos la versión
+            def version = readFile('version.txt').trim()
+            if (!version) {
+                error "❌ version.txt está vacío o no existe"
+            }
+            echo "✅ Versión leída: ${version}"
+
+            withCredentials([usernamePassword(
+              credentialsId: 'dockerhub-creds',
+              usernameVariable: 'DOCKER_USER',
+              passwordVariable: 'DOCKER_PASS'
+            )]) {
+              sh """
+                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                docker tag ${IMAGE_NAME}:latest ${DOCKER_REPO}:${version}
+                docker push ${DOCKER_REPO}:${version}
+              """
+            }
         }
       }
     }
