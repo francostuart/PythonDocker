@@ -117,7 +117,7 @@ pipeline {
 
             sh """
               echo "Construyendo imagen Docker..."
-              docker buildx build --builder multiarch --platform linux/amd64 --no-cache -t ${IMAGE_NAME}:${version} .
+              docker buildx build --builder multiarch --platform linux/amd64 --no-cache --load -t ${IMAGE_NAME}:${version} .
             """
         }
       }
