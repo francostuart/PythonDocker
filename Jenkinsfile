@@ -94,6 +94,16 @@ pipeline {
       }
     }*/
 
+    stage('Setup Buildx') {
+      steps {
+        sh '''
+          docker run --privileged --rm tonistiigi/binfmt --install all
+          docker buildx create --name multiarch --driver docker-container --use
+          docker buildx inspect --bootstrap
+        '''
+      }
+    }
+
     stage('Build Docker Image') {
       steps {
         script {
@@ -107,7 +117,7 @@ pipeline {
 
             sh """
               echo "Construyendo imagen Docker..."
-              docker buildx build --platform linux/amd64 --no-cache -t ${IMAGE_NAME}:${version} .
+              docker buildx build --builder multiarch --platform linux/amd64 --no-cache -t ${IMAGE_NAME}:${version} .
             """
         }
       }
