@@ -98,6 +98,7 @@ pipeline {
       steps {
         sh '''
           docker run --privileged --rm tonistiigi/binfmt --install all
+          docker buildx ls | grep -q 'multiarch' && docker buildx rm multiarch || true
           docker buildx create --name multiarch --driver docker-container --use
           docker buildx inspect --bootstrap
         '''
