@@ -30,7 +30,7 @@ def ejecutar_en_horario(hora_inicio, hora_fin, intervalo=3600):
         # Verificar si estamos dentro del horario deseado
         if hora_inicio <= ahora <= hora_fin:
             print(f"Ejecutando script a las {ahora}")
-            tu_script_principal(ruta="/Users/ricardobuenobalbis/Desktop/Carga_5_2025.xlsx")
+            tu_script_principal(ruta=r"C:\Users\Franco Stuart\OneDrive\Desktop\python-docker\PythonDocker\input.xlsx")
         else:
             print(f"Fuera del horario programado. Hora actual: {ahora}")
 
@@ -42,6 +42,6 @@ def ejecutar_en_horario(hora_inicio, hora_fin, intervalo=3600):
 if __name__ == "__main__":
     ejecutar_en_horario(
         hora_inicio=(9, 30),  # 9:30 AM
-        hora_fin=(18, 00),  # 6:15 PM
+        hora_fin=(23, 50),  # 6:15 PM
         intervalo=100  # 5 minutos (300 segundos)
     )
