@@ -41,7 +41,7 @@ def ejecutar_en_horario(hora_inicio, hora_fin, intervalo=3600):
 # Ejemplo: ejecutar entre las 9:30 y las 18:15, verificando cada 5 minutos
 if __name__ == "__main__":
     ejecutar_en_horario(
-        hora_inicio=(9, 30),  # 9:30 AM
+        hora_inicio=(5, 30),  # 9:30 AM
         hora_fin=(23, 50),  # 6:15 PM
         intervalo=100  # 5 minutos (300 segundos)
     )
