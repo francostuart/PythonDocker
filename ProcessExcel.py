@@ -83,14 +83,17 @@ def ejecutar_procesamiento(hora_inicio: dt_time, hora_fin: dt_time, intervalo: i
             # Procesar todos los archivos encontrados
             archivos = encontrar_archivos_excel()
             if not archivos:
+                print("No se encontraron archivos para procesar")
                 logger.warning("No se encontraron archivos para procesar")
             else:
                 for archivo in archivos:
                     procesar_archivo(archivo)
 
+            print(f"Esperando {intervalo} segundos para el próximo ciclo")
             logger.info(f"Esperando {intervalo} segundos para el próximo ciclo")
             time.sleep(intervalo)
         else:
+            print(f"Fuera del horario programado. Hora actual: {ahora}")
             logger.info(f"Fuera del horario programado. Hora actual: {ahora}")
             time.sleep(60)  # Espera 1 minuto antes de volver a verificar
 
